@@ -1,0 +1,111 @@
+@model List<TodoApp.Models.TodoItem>
+@using TodoApp.Models
+
+<div class="container mt-4">
+    <h2 class="mb-4">
+    <span style="color: white;">Todo</span><span style="background-color: #ff9900; color: black; padding: 0 8px;">Hub</span>
+    </h2>
+
+    <div class="row mb-4 align-items-stretch">
+        <div class="col-md-6 mb-3 mb-md-0">
+            <form method="post" asp-action="Add" class="card card-body shadow-sm h-100">
+                <h5>Add New Task</h5>
+                <div class="mb-2">
+                    <input class="form-control" name="title" placeholder="Task Title" required />
+                </div>
+                <div class="mb-2">
+                    <select class="form-select" name="category">
+                        <option value="Homemades">Homemades</option>         
+                        <option value="HardTasks">HardTasks</option>      
+                        <option value="SoftGrind">SoftGrind</option>      
+                        <option value="Public Errands">Public Errands</option> 
+                        <option value="Quickies">Quickies</option>          
+                        <option value="Solo Runs">Solo Runs</option>  
+                        <option value="Role-Plans">Role-Plans</option>   
+                        <option value="Latex Deadlines">Latex Deadlines</option> 
+                        <option value="BDSM (Budget, Deadlines, Schedules, Meetings)">BDSM (Budget, Deadlines, Schedules, Meetings)</option> <!-- Funny corporate twist -->
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <select class="form-select" name="priority">
+                        <option value="Low">Low Priority</option>
+                        <option value="Medium">Medium Priority</option>
+                        <option value="High">High Priority</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">Add Task</button>
+            </form>
+        </div>
+
+        <div class="col-md-6">
+            <form method="get" class="card card-body shadow-sm h-100">
+                <h5>Filter Tasks</h5>
+                <div class="mb-2">
+                    <select class="form-select" name="category">
+                        <option value="Homemades">Homemades</option>         
+                        <option value="HardTasks">HardTasks</option>      
+                        <option value="SoftGrind">SoftGrind</option>      
+                        <option value="Public Errands">Public Errands</option> 
+                        <option value="Quickies">Quickies</option>          
+                        <option value="Solo Runs">Solo Runs</option>  
+                        <option value="Role-Plans">Role-Plans</option>   
+                        <option value="Latex Deadlines">Latex Deadlines</option> 
+                        <option value="BDSM (Budget, Deadlines, Schedules, Meetings)">BDSM (Budget, Deadlines, Schedules, Meetings)</option> <!-- Funny corporate twist -->
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <select class="form-select" name="priority">
+                        <option value="">-- Select Priority --</option>
+                        <option value="Low">Low</option>
+                        <option value="Medium">Medium</option>
+                        <option value="High">High</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-outline-secondary">Apply Filter</button>
+            </form>
+        </div>
+    </div>
+
+    <ul class="list-group">
+        @foreach (var item in Model.Where(x => !x.IsHidden))
+        {
+            <li class="list-group-item d-flex justify-content-between align-items-center 
+                       @(item.IsCompleted ? "list-group-item-success" : "")">
+                <div>
+                    <h6 class="mb-0">@item.Title</h6>
+                    <small class="text-muted">@item.Category</small>
+                    <span class="badge bg-secondary ms-2">@item.Priority</span>
+                </div>
+                <div>
+                    @if (!item.IsCompleted)
+                    {
+                        <a asp-action="Complete" asp-route-id="@item.Id" class="btn btn-sm btn-success me-2">✓ Done</a>
+                    }
+
+                    <form method="post" asp-action="ToggleVisibility" asp-route-id="@item.Id" class="d-inline">
+                        <button type="submit" class="btn btn-sm btn-warning me-2">Hide</button>
+                    </form>
+
+                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">🗑 Delete</a>
+                </div>
+            </li>
+        }
+    </ul>
+
+    <h5 class="mt-4">Hidden Tasks</h5>
+    <ul class="list-group">
+        @foreach (var item in Model.Where(x => x.IsHidden))
+        {
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                    <h6 class="mb-0 text-muted">@item.Title (Hidden)</h6>
+                </div>
+                <div>
+                    <form method="post" asp-action="ToggleVisibility" asp-route-id="@item.Id" class="d-inline">
+                        <button type="submit" class="btn btn-sm btn-secondary">Unhide</button>
+                    </form>
+                </div>
+            </li>
+        }
+    </ul>
+</div>
