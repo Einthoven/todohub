@@ -3,7 +3,7 @@
 
 <div class="container mt-4">
     <h2 class="mb-4">
-    <span style="color: white;">Todo</span><span style="background-color: #ff9900; color: black; padding: 0 8px;">Hub</span>
+    <span style="color: white;">Todo</span><span style="background-color: #ff9900; color: black; padding: 0 8px; border-radius: 0.5rem;">Hub</span>
     </h2>
 
     <div class="row mb-4 align-items-stretch">
@@ -11,7 +11,7 @@
             <form method="post" asp-action="Add" class="card card-body shadow-sm h-100">
                 <h5>Add New Task</h5>
                 <div class="mb-2">
-                    <input class="form-control" name="title" placeholder="Task Title" required />
+                    <input class="form-control" name="title" placeholder="Task Title" maxlength="40" required />
                 </div>
                 <div class="mb-2">
                     <select class="form-select" name="category">
@@ -42,6 +42,7 @@
                 <h5>Filter Tasks</h5>
                 <div class="mb-2">
                     <select class="form-select" name="category">
+                        <option value="">All Categories</option>
                         <option value="Homemades">Homemades</option>         
                         <option value="HardTasks">HardTasks</option>      
                         <option value="SoftGrind">SoftGrind</option>      
@@ -55,7 +56,7 @@
                 </div>
                 <div class="mb-3">
                     <select class="form-select" name="priority">
-                        <option value="">-- Select Priority --</option>
+                        <option value="">All Priorities</option>
                         <option value="Low">Low</option>
                         <option value="Medium">Medium</option>
                         <option value="High">High</option>
@@ -66,31 +67,41 @@
         </div>
     </div>
 
+    @if (Model.Any(x => !x.IsHidden))
+    {
     <ul class="list-group">
         @foreach (var item in Model.Where(x => !x.IsHidden))
         {
-            <li class="list-group-item d-flex justify-content-between align-items-center 
-                       @(item.IsCompleted ? "list-group-item-success" : "")">
-                <div>
-                    <h6 class="mb-0">@item.Title</h6>
+            <li class="list-group-item d-flex justify-content-between align-items-center @(item.IsCompleted ? "list-group-item-success" : "")">
+                <div class="flex-grow-1 me-3" style="min-width: 0;">
+                    <h6 class="mb-0 text-muted text-truncate" style="max-width: 100%;" title="@item.Title">@item.Title</h6>
                     <small class="text-muted">@item.Category</small>
                     <span class="badge bg-secondary ms-2">@item.Priority</span>
                 </div>
-                <div>
+                <div class="d-flex flex-column flex-md-row text-nowrap">
                     @if (!item.IsCompleted)
                     {
-                        <a asp-action="Complete" asp-route-id="@item.Id" class="btn btn-sm btn-success me-2">✓ Done</a>
+                        <a asp-action="Complete" asp-route-id="@item.Id" class="btn btn-sm btn-success mb-2 me-md-2 equal-width-btn">✓ Done</a>
+                    }
+                    else
+                    {
+                        <a asp-action="Undo" asp-route-id="@item.Id" class="btn btn-sm btn-dark mb-2 me-md-2 equal-width-btn">↩ Undone</a>
                     }
 
                     <form method="post" asp-action="ToggleVisibility" asp-route-id="@item.Id" class="d-inline">
-                        <button type="submit" class="btn btn-sm btn-warning me-2">Hide</button>
+                        <button type="submit" class="btn btn-sm btn-warning mb-2 me-md-2 equal-width-btn">Hide</button>
                     </form>
 
-                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">🗑 Delete</a>
+                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger mb-2 equal-width-btn">🗑 Delete</a>
                 </div>
             </li>
         }
     </ul>
+    }
+    else
+    {
+        <div class="text-muted">No active tasks to show.</div>
+    }
 
     <h5 class="mt-4">Hidden Tasks</h5>
     <ul class="list-group">
@@ -98,7 +109,7 @@
         {
             <li class="list-group-item d-flex justify-content-between align-items-center">
                 <div>
-                    <h6 class="mb-0 text-muted">@item.Title (Hidden)</h6>
+                    <h6 h6 class="mb-0 text-muted text-truncate" style="width: 80px;">@item.Title (Hidden)</h6>
                 </div>
                 <div>
                     <form method="post" asp-action="ToggleVisibility" asp-route-id="@item.Id" class="d-inline">

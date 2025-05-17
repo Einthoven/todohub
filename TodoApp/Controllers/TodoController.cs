@@ -22,6 +22,18 @@ namespace TodoApp.Controllers
             return View(filtered.ToList());
         }
 
+        [HttpGet]
+        public IActionResult Undo(int id)
+        {
+            var item = Items.FirstOrDefault(x => x.Id == id);
+            if (item != null)
+            {
+                item.IsCompleted = false;
+            }
+            return RedirectToAction("Index");
+        }
+
+
         [HttpPost]
         public IActionResult Add(string title, string category, Priority priority)
         {

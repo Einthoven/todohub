@@ -8,8 +8,13 @@ html {
   }
 }
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus, .form-select:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #ff9900;
+  outline: none;
+}
+
+.btn:focus:active {
+  background-color: rgb(209, 133, 19);
 }
 
 html {
@@ -37,12 +42,12 @@ body {
 }
 
 .text-primary {
-  color: #f90 !important;
+  color: #ff9900 !important;
 }
 
 .btn-primary {
-  background-color: #f90;
-  border-color: #f90;
+  background-color: #ff9900;
+  border-color: #ff9900;
   color: #111;
 }
 
@@ -92,11 +97,19 @@ body {
 }
 
 .list-group-item-success {
-  background-color: #2a4;
+  background-color: rgba(72, 245, 118, 0.3);
   color: #fff;
 }
 
 .badge.bg-secondary {
   background-color: #f90;
-  color: #111;
+  color: #eee;
+}
+
+.text-muted {
+  color: #eee !important;
+}
+
+.equal-width-btn {
+    min-width: 90px;
 }
