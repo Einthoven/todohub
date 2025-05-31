@@ -1,6 +1,12 @@
+using Microsoft.EntityFrameworkCore;
+using TodoApp.Models; 
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddDbContext<TodoDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 var app = builder.Build();
 
@@ -21,6 +27,5 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Todo}/{action=Index}/{id?}")
     .WithStaticAssets();
-
 
 app.Run();

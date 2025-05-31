@@ -1,71 +1,91 @@
 using Microsoft.AspNetCore.Mvc;
 using TodoApp.Models;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace TodoApp.Controllers
 {
     public class TodoController : Controller
     {
-        private static List<TodoItem> Items = new List<TodoItem>();
+        private readonly TodoDbContext _context;
+
+        public TodoController(TodoDbContext context)
+        {
+            _context = context;
+        }
 
         public IActionResult Index(string category, Priority? priority)
         {
-            var filtered = Items.AsQueryable();
+            var query = _context.TodoItems.AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(category))
-                filtered = filtered.Where(x => x.Category == category);
+                query = query.Where(x => x.Category == category);
 
             if (priority.HasValue)
-                filtered = filtered.Where(x => x.Priority == priority);
+                query = query.Where(x => x.Priority == priority);
 
-            return View(filtered.ToList());
+            return View(query.ToList());
         }
-
-        [HttpGet]
-        public IActionResult Undo(int id)
-        {
-            var item = Items.FirstOrDefault(x => x.Id == id);
-            if (item != null)
-            {
-                item.IsCompleted = false;
-            }
-            return RedirectToAction("Index");
-        }
-
 
         [HttpPost]
         public IActionResult Add(string title, string category, Priority priority)
         {
-            Items.Add(new TodoItem { Id = Items.Count + 1, Title = title, Category = category, Priority = priority });
+            var item = new TodoItem
+            {
+                Title = title,
+                Category = category,
+                Priority = priority,
+                IsCompleted = false,
+                IsHidden = false
+            };
+
+            _context.TodoItems.Add(item);
+            _context.SaveChanges();
+
+            return RedirectToAction("Index");
+        }
+
+        public IActionResult Undo(int id)
+        {
+            var item = _context.TodoItems.FirstOrDefault(x => x.Id == id);
+            if (item != null)
+            {
+                item.IsCompleted = false;
+                _context.SaveChanges();
+            }
             return RedirectToAction("Index");
         }
 
         public IActionResult ToggleVisibility(int id)
         {
-            var item = Items.FirstOrDefault(x => x.Id == id);
+            var item = _context.TodoItems.FirstOrDefault(x => x.Id == id);
             if (item != null)
             {
                 item.IsHidden = !item.IsHidden;
+                _context.SaveChanges();
             }
             return RedirectToAction("Index");
         }
-        
 
         public IActionResult Complete(int id)
         {
-            var item = Items.FirstOrDefault(x => x.Id == id);
-            if (item != null) item.IsCompleted = true;
+            var item = _context.TodoItems.FirstOrDefault(x => x.Id == id);
+            if (item != null)
+            {
+                item.IsCompleted = true;
+                _context.SaveChanges();
+            }
             return RedirectToAction("Index");
         }
 
         public IActionResult Delete(int id)
         {
-            var item = Items.FirstOrDefault(x => x.Id == id);
-            if (item != null) Items.Remove(item);
+            var item = _context.TodoItems.FirstOrDefault(x => x.Id == id);
+            if (item != null)
+            {
+                _context.TodoItems.Remove(item);
+                _context.SaveChanges();
+            }
             return RedirectToAction("Index");
         }
-
-        
     }
 }
